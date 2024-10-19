@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Menu from './components/Menu.js'; // Ensure this path is correct
 import DebaterList from './components/DebaterList.js';
 import Rankings from "./components/Rankings.js";
-// Import other components as needed
+import SpeakerGraphs from "./components/SpeakerGraphs.js";
+import MasterTab from "./components/MasterTab.js";
+
 
 const App = () => {
     return (
@@ -13,9 +15,9 @@ const App = () => {
                 <Routes>
                     <Route path="/debaters" element={<DebaterList />} />
                     <Route path="/rankings" element={<Rankings />} />
-                    {/*<Route path="/judges" element={<JudgesComponent />} />*/}
+                    <Route path="/master-tab" element={<MasterTab/>} />
                     {/*<Route path="/rankings" element={<RankingsComponent />} />*/}
-                    {/*<Route path="/tournaments" element={<TournamentsComponent />} />*/}
+                    <Route path="/graphs" element={<SpeakerGraphs />} />
                 </Routes>
             </div>
         </Router>

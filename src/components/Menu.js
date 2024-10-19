@@ -10,13 +10,13 @@ const Menu = () => {
                     <Link to="/debaters" style={{ textDecoration: 'none', color: 'blue' }}>Debaters</Link>
                 </li>
                 <li>
-                    <Link to="/judges" style={{ textDecoration: 'none', color: 'blue' }}>Judges</Link>
+                    <Link to="/master-tab" style={{ textDecoration: 'none', color: 'blue' }}>Master Tab</Link>
                 </li>
                 <li>
-                    <Link to="/rankings" style={{ textDecoration: 'none', color: 'blue' }}>Rankings</Link>
+                    <Link to="/rankings" style={{ textDecoration: 'none', color: 'blue' }}>Tournament Speaks</Link>
                 </li>
                 <li>
-                    <Link to="/tournaments" style={{ textDecoration: 'none', color: 'blue' }}>Tournaments</Link>
+                    <Link to="/graphs" style={{ textDecoration: 'none', color: 'blue' }}>Graphs</Link>
                 </li>
             </ul>
         </nav>
