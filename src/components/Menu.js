@@ -13,10 +13,10 @@ const Menu = () => {
                     <Link to="/master-tab" style={{ textDecoration: 'none', color: 'blue' }}>Master Tab</Link>
                 </li>
                 <li>
-                    <Link to="/rankings" style={{ textDecoration: 'none', color: 'blue' }}>Tournament Speaks</Link>
+                    <Link to="/graphs" style={{ textDecoration: 'none', color: 'blue' }}>Graphs</Link>
                 </li>
                 <li>
-                    <Link to="/graphs" style={{ textDecoration: 'none', color: 'blue' }}>Graphs</Link>
+                    <Link to="/institutions" style={{ textDecoration: 'none', color: 'blue' }}>Institutions</Link>
                 </li>
             </ul>
         </nav>

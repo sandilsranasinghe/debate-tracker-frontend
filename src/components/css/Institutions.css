@@ -1,0 +1,53 @@
+.app {
+    padding: 20px;
+}
+
+.letter-header {
+    margin-top: 20px;
+    font-size: 1.5em;
+}
+
+.institution-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.institution-name {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.empty {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.merge-button-container {
+    position: sticky;
+    bottom: 10px;
+    right: 10px;
+    padding: 10px;
+    background-color: #f8f9fa; /* Optional background color */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Checkbox container */
+.checkbox-container {
+    width: 20px;
+}
+
+/* Row hover effect */
+table tbody tr {
+    cursor: pointer; /* Changes the cursor to pointer when hovering */
+    transition: background-color 0.3s; /* Smooth transition for the background color */
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1; /* Light gray color on hover */
+}
