@@ -1,0 +1,115 @@
+/* General styling for the entire app */
+.app {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.judge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.judge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.judge-row:hover {
+    background-color: #f1f1f1;
+}
+
+.judge-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.rounds-list {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #555;
+    font-style: italic;
+}
+
+.merge-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+/* Loading and empty state */
+p {
+    text-align: center;
+    color: #666;
+}
+
+.empty {
+    text-align: center;
+    color: #999;
+    font-size: 18px;
+}
+.truncate{
+    width:30px;
+    font-size: 12px;
+    padding: 1px;
+}
+
+/* Ensure the app is responsive on smaller screens */
+@media (max-width: 600px) {
+    .app {
+        padding: 15px;
+    }
+
+    .judge-name {
+        font-size: 14px;
+    }
+
+    .rounds-list {
+        font-size: 12px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}

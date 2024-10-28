@@ -18,6 +18,15 @@ const Menu = () => {
                 <li>
                     <Link to="/institutions" style={{ textDecoration: 'none', color: 'blue' }}>Institutions</Link>
                 </li>
+                <li>
+                    <Link to="/judge-stats" style={{ textDecoration: 'none', color: 'blue' }}>Judge Stats</Link>
+                </li>
+                <li>
+                    <Link to="/judge-speaks" style={{ textDecoration: 'none', color: 'blue' }}>Judge Speaks</Link>
+                </li>
+                <li>
+                    <Link to="/judge" style={{ textDecoration: 'none', color: 'blue' }}>Judges</Link>
+                </li>
             </ul>
         </nav>
     );

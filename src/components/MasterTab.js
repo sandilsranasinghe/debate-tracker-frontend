@@ -1,14 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import './css/Rankings.css'; // Import the CSS file
+import './css/Rankings.css';
+
+// Utility Functions
+const removeOutliers = (scores) => {
+    const q1 = scores[Math.floor((scores.length / 4))];
+    const q3 = scores[Math.ceil((scores.length * (3 / 4))) - 1];
+    const iqr = q3 - q1;
+    return scores.filter(score => score >= (q1 - 1.5 * iqr) && score <= (q3 + 1.5 * iqr));
+};
+
+const calcAverage = (scores) => (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+
+const calcStandardDeviation = (scores) => {
+    const avg = calcAverage(scores);
+    return Math.sqrt(scores.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / scores.length).toFixed(2);
+};
 
 const MasterTab = () => {
     const [rankings, setRankings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
-    // const API_URL = `${process.env.REACT_APP_API_BASE_URL}/ballot/debater-scores-all`;
-    const API_URL = `http://localhost:8080/api/v1/ballot/debater-scores-all`;
-
+    const API_URL = `http://localhost:8080/api/v1/ballot/debater/scores-all`;
 
     const fetchRankings = async () => {
         try {
@@ -29,51 +43,92 @@ const MasterTab = () => {
         fetchRankings();
     }, []);
 
+    const sortedRankings = React.useMemo(() => {
+        let sortableRankings = [...rankings];
+        if (sortConfig.key) {
+            sortableRankings.sort((a, b) => {
+                let aValue, bValue;
+                if (sortConfig.key === 'avgScoreWOOutliers' || sortConfig.key === 'stdDev') {
+                    const aScores = a.scores.slice().sort((x, y) => x - y);
+                    const bScores = b.scores.slice().sort((x, y) => x - y);
+
+                    const aFiltered = removeOutliers(aScores);
+                    const bFiltered = removeOutliers(bScores);
+
+                    aValue = sortConfig.key === 'avgScoreWOOutliers' ? calcAverage(aFiltered) : calcStandardDeviation(aFiltered);
+                    bValue = sortConfig.key === 'avgScoreWOOutliers' ? calcAverage(bFiltered) : calcStandardDeviation(bFiltered);
+                } else {
+                    aValue = a[sortConfig.key];
+                    bValue = b[sortConfig.key];
+                }
+
+                if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
+                if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
+                return 0;
+            });
+        }
+        return sortableRankings;
+    }, [rankings, sortConfig]);
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+    const [expandedRows, setExpandedRows] = useState({}); // Track expanded rows
+
     if (loading) return <p>Loading rankings...</p>;
     if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
-
+    const toggleExpand = (index) => {
+        setExpandedRows(prev => ({
+            ...prev,
+            [index]: !prev[index]
+        }));
+    };
     return (
         <div className="rankings">
             <h1>Debater Rankings</h1>
             <table>
                 <thead>
                 <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
+                    <th onClick={() => requestSort('firstName')}>First Name</th>
+                    <th onClick={() => requestSort('lastName')}>Last Name</th>
                     <th>Scores</th>
-                    <th>Average Score WO Outliers</th>
-                    <th>Average Score</th>
-                    <th>Rounds Debated</th>
-                    <th>Standard Deviation</th>
+                    <th onClick={() => requestSort('avgScoreWOOutliers')}>Average Score WO Outliers</th>
+                    <th onClick={() => requestSort('avgScore')}>Average Score</th>
+                    <th onClick={() => requestSort('roundsDebated')}>Rounds Debated</th>
+                    <th onClick={() => requestSort('stdDev')}>Standard Deviation</th>
                 </tr>
                 </thead>
                 <tbody>
-                {rankings.map((debater, index) => {
-                    const scores = debater.scores.sort((a, b) => a - b); // Sort scores
-                    const q1 = scores[Math.floor((scores.length / 4))];
-                    const q3 = scores[Math.ceil((scores.length * (3 / 4))) - 1];
-                    const iqr = q3 - q1;
-
-                    const filteredScores = scores.filter(score =>
-                        score >= (q1 - 1.5 * iqr) && score <= (q3 + 1.5 * iqr)
-                    );
-
-                    const avgScore = (filteredScores.reduce((a, b) => a + b, 0) / filteredScores.length).toFixed(2);
-                    const stddev = (Math.sqrt(filteredScores.reduce((a, b) => a + Math.pow(b - avgScore, 2), 0) / filteredScores.length)).toFixed(2);
+                {sortedRankings.map((debater, index) => {
+                    const scores = debater.scores.sort((a, b) => a - b);
+                    const filteredScores = removeOutliers(scores);
+                    const avgScoreWOOutliers = calcAverage(filteredScores);
+                    const stdDev = calcStandardDeviation(filteredScores);
 
                     return (
                         <tr key={index}>
                             <td>{debater.firstName}</td>
                             <td>{debater.lastName}</td>
-                            <td>{filteredScores.join(', ')}</td>
-                            <td>{avgScore}</td>
-                            <td>{(debater.avgScore).toFixed(2)}</td>
+                            {/*<td>{filteredScores.join(', ')}</td>*/}
+                            <td>
+                                {expandedRows[index]
+                                    ? filteredScores.join(', ') // Show full list if expanded
+                                    : `${filteredScores.slice(0, 3).join(', ')}...`} {/* Truncated view */}
+                                <button className="truncate" onClick={() => toggleExpand(index)}>
+                                    {expandedRows[index] ? 'Show Less' : 'Show More'}
+                                </button>
+                            </td>
+                            <td>{avgScoreWOOutliers}</td>
+                            <td>{debater.avgScore.toFixed(2)}</td>
                             <td>{debater.roundsDebated}</td>
-                            <td>{stddev}</td>
+                            <td>{stdDev}</td>
                         </tr>
                     );
                 })}
-
                 </tbody>
             </table>
         </div>
