@@ -5,7 +5,6 @@ import {styled} from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Button from "@mui/material/Button/Button";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 const NavButton = styled(Button)(() => ({
@@ -42,11 +41,8 @@ const Menu = () => {
             <NavButton component={Link} to="/institutions">
               Institutions
             </NavButton>
-            <NavButton component={Link} to="/judge-rounds">
-              Judge Rounds
-            </NavButton>
             <NavButton component={Link} to="/judge-speaks">
-              Judge Speaks
+              Judge Tab
             </NavButton>
             <NavButton component={Link} to="/judge">
               Judges
