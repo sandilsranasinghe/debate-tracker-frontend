@@ -25,9 +25,10 @@ const Menu = () => {
   return (
       <AppBar position="static">
         <Toolbar>
-          <Box sx={{flexGrow: 1}}>
-            <Typography textAlign="left">DC LOGO</Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <img src="/main-logo-dark.svg" alt="DC Logo" style={{ width: '90px', height: 'auto' }}/>
           </Box>
+
           <Box sx={{flexGrow: 0}}>
             <NavButton component={Link} to="/debaters">
               Debaters

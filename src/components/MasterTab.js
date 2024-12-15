@@ -112,28 +112,41 @@ const MasterTab = () => {
               {
                 field: "avgScore",
                 headerName: "Average Score",
-                width: 150,
+                width: 100,
                 sortable: true,
               },
               {
                 field: "avgScoreWOOutliers",
                 headerName: "Avg Score WO Outliers",
-                width: 200,
+                width: 100,
                 sortable: true,
               },
               {
                 field: "roundsDebated",
                 headerName: "Rounds Debated",
-                width: 150,
+                width: 100,
                 sortable: true,
               },
               {
                 field: "stdDev",
                 headerName: "Standard Deviation",
-                width: 150,
+                width: 100,
                 sortable: true,
               },
             ]}
+            sx={{
+                '& .MuiDataGrid-columnHeaders': {
+                    wordBreak: 'break-word',  // Ensures the header text wraps
+                    lineHeight: '1.5',        // Adjusts the height of the header row
+                    minHeight: '60px',        // Sets a minimum height for the header row to accommodate wrapped text
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                    whiteSpace: 'normal',     // Allows text to wrap inside header cells
+                    overflow: 'visible',      // Ensures that content doesn't overflow out of the cell
+                    textOverflow: 'unset',    // Prevents truncation of text
+                    wordWrap: 'break-word',   // Allows word wrapping
+                },
+            }}
         />
       </Paper>
   );
