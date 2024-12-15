@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Paper from "@mui/material/Paper";
 import StyledDataGrid from "../utils/styledDataGrid";
+import {GridToolbar} from "@mui/x-data-grid";
 
 // Utility Functions
 const removeOutliers = (scores) => {
@@ -146,6 +147,9 @@ const MasterTab = () => {
                     textOverflow: 'unset',    // Prevents truncation of text
                     wordWrap: 'break-word',   // Allows word wrapping
                 },
+            }}
+            components={{
+                Toolbar: GridToolbar,
             }}
         />
       </Paper>

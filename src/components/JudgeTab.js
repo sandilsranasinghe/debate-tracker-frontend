@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
 import Paper from "@mui/material/Paper";
 import StyledDataGrid from "../utils/styledDataGrid";
+import {GridToolbar} from "@mui/x-data-grid";
 
-// JudgeSpeaks Component
+// JudgeTab Component
 const JudgeSpeaks = () => {
   const [judges, setJudges] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,6 +151,9 @@ const JudgeSpeaks = () => {
                     textOverflow: 'unset',    // Prevents truncation of text
                     wordWrap: 'break-word',   // Allows word wrapping
                 },
+            }}
+            components={{
+                Toolbar: GridToolbar,
             }}
         />
       </Paper>

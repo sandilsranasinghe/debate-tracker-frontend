@@ -29,24 +29,25 @@ const Menu = () => {
           </Box>
 
           <Box sx={{flexGrow: 0}}>
-            <NavButton component={Link} to="/debaters">
-              Debaters
-            </NavButton>
+            {/*TODO  Move some of these to admin view*/}
+            {/*<NavButton component={Link} to="/debaters">*/}
+            {/*  Debaters*/}
+            {/*</NavButton>*/}
             <NavButton component={Link} to="/master-tab">
               Master Tab
             </NavButton>
             <NavButton component={Link} to="/graphs">
               Graphs
             </NavButton>
-            <NavButton component={Link} to="/institutions">
-              Institutions
-            </NavButton>
-            <NavButton component={Link} to="/judge-speaks">
+            {/*<NavButton component={Link} to="/institutions">*/}
+            {/*  Institutions*/}
+            {/*</NavButton>*/}
+            <NavButton component={Link} to="/judge-tab">
               Judge Tab
             </NavButton>
-            <NavButton component={Link} to="/judge">
-              Judges
-            </NavButton>
+            {/*<NavButton component={Link} to="/judge">*/}
+            {/*  Judges*/}
+            {/*</NavButton>*/}
           </Box>
         </Toolbar>
       </AppBar>
