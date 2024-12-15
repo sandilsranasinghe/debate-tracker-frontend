@@ -46,7 +46,36 @@ const MasterTab = () => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.json();
-      setRankings(data);
+
+      const transformedRankings = data.map((debater) => {
+        const scores = debater.tournamentRoundScores
+            ? debater.tournamentRoundScores.flatMap((tournament) =>
+                tournament.roundScores.map((round) => round.score)
+            )
+            : [];
+
+        const avgScore = scores.length > 0 ? calcAverage(scores) : 0;
+        const avgScoreWOOutliers =
+            scores.length > 0 ? calcAverage(removeOutliers(scores)) : 0;
+        const roundsDebated = debater.tournamentRoundScores
+            ? debater.tournamentRoundScores.reduce(
+                (sum, tournament) => sum + tournament.numberOfRounds,
+                0
+            )
+            : 0;
+
+        return {
+          ...debater,
+          scores,
+          avgScore,
+          avgScoreWOOutliers,
+          roundsDebated,
+          stdDev: scores.length > 0 ? calcStandardDeviation(scores) : 0,
+        };
+      }).filter((debater) => debater.roundsDebated > 0);
+
+      console.log("Transformed Rankings:", transformedRankings); // Debugging log
+      setRankings(transformedRankings);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -59,47 +88,38 @@ const MasterTab = () => {
   }, []);
 
   if (loading) return <p>Loading rankings...</p>;
-  if (error) return <p style={{color: "red"}}>Error: {error}</p>;
+  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+
   return (
-      <Paper sx={{maxWidth: "94vw", marginInline: "auto", marginBlock: "4vh"}}>
+      <Paper sx={{ maxWidth: "94vw", marginInline: "auto", marginBlock: "4vh" }}>
         <StyledDataGrid
-            rows={rankings.map((debater, index) => {
-              return {...debater, id: index + 1};
-            })}
+            rows={rankings.map((debater, index) => ({
+              ...debater,
+              id: debater.id || index + 1, // Use ID or index as a fallback
+              scores: debater.scores || [], // Fallback to empty array
+            }))}
+
             columns={[
-              {
-                field: "firstName",
-                headerName: "First Name",
-                width: 150,
-                sortable: true,
-              },
-              {
-                field: "lastName",
-                headerName: "Last Name",
-                width: 150,
-                sortable: true,
-              },
+              { field: "firstName", headerName: "First Name", width: 150, sortable: true },
+              { field: "lastName", headerName: "Last Name", width: 150, sortable: true },
               {
                 field: "scores",
                 headerName: "Scores",
                 flex: 1,
                 sortable: false,
               },
+
               {
                 field: "avgScore",
                 headerName: "Average Score",
                 width: 150,
                 sortable: true,
-                valueFormatter: (value) => value.toFixed(2),
               },
               {
                 field: "avgScoreWOOutliers",
                 headerName: "Avg Score WO Outliers",
                 width: 200,
                 sortable: true,
-                valueGetter: (value, row) => {
-                  return calcAverage(removeOutliers(row.scores.sort()));
-                },
               },
               {
                 field: "roundsDebated",
@@ -112,9 +132,6 @@ const MasterTab = () => {
                 headerName: "Standard Deviation",
                 width: 150,
                 sortable: true,
-                valueGetter: (value, row) => {
-                  return calcStandardDeviation(row.scores);
-                },
               },
             ]}
         />
