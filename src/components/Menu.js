@@ -1,35 +1,59 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import './css/Menu.css';
+import React from "react";
+import {Link} from "react-router-dom";
+
+import {styled} from "@mui/material/styles";
+import AppBar from "@mui/material/AppBar";
+import Button from "@mui/material/Button/Button";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+
+const NavButton = styled(Button)(() => ({
+  marginRight: "10px",
+  fontWeight: "bolder",
+  backgroundImage:
+      "linear-gradient(45deg, transparent 40%, #ffffff11, transparent 60%)",
+  backgroundSize: "300%",
+  backgroundPosition: "0% 0%",
+  transition: "background-position 1s",
+  "&:hover": {
+    backgroundPosition: "100% 100%",
+  },
+}));
 
 const Menu = () => {
-    return (
-        <nav style={{ marginBottom: '20px' }}>
-            <ul style={{ listStyleType: 'none', padding: 0 }}>
-                <li>
-                    <Link to="/debaters" style={{ textDecoration: 'none', color: 'blue' }}>Debaters</Link>
-                </li>
-                <li>
-                    <Link to="/master-tab" style={{ textDecoration: 'none', color: 'blue' }}>Master Tab</Link>
-                </li>
-                <li>
-                    <Link to="/graphs" style={{ textDecoration: 'none', color: 'blue' }}>Graphs</Link>
-                </li>
-                <li>
-                    <Link to="/institutions" style={{ textDecoration: 'none', color: 'blue' }}>Institutions</Link>
-                </li>
-                <li>
-                    <Link to="/judge-stats" style={{ textDecoration: 'none', color: 'blue' }}>Judge Stats</Link>
-                </li>
-                <li>
-                    <Link to="/judge-speaks" style={{ textDecoration: 'none', color: 'blue' }}>Judge Speaks</Link>
-                </li>
-                <li>
-                    <Link to="/judge" style={{ textDecoration: 'none', color: 'blue' }}>Judges</Link>
-                </li>
-            </ul>
-        </nav>
-    );
+  return (
+      <AppBar position="static">
+        <Toolbar>
+          <Box sx={{flexGrow: 1}}>
+            <Typography textAlign="left">DC LOGO</Typography>
+          </Box>
+          <Box sx={{flexGrow: 0}}>
+            <NavButton component={Link} to="/debaters">
+              Debaters
+            </NavButton>
+            <NavButton component={Link} to="/master-tab">
+              Master Tab
+            </NavButton>
+            <NavButton component={Link} to="/graphs">
+              Graphs
+            </NavButton>
+            <NavButton component={Link} to="/institutions">
+              Institutions
+            </NavButton>
+            <NavButton component={Link} to="/judge-rounds">
+              Judge Rounds
+            </NavButton>
+            <NavButton component={Link} to="/judge-speaks">
+              Judge Speaks
+            </NavButton>
+            <NavButton component={Link} to="/judge">
+              Judges
+            </NavButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+  );
 };
 
 export default Menu;

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { LineChart } from '@mui/x-charts';
-import './css/SpeakerGraphs.css'; // Import the CSS file
+import React, {useState} from 'react';
+import {LineChart} from '@mui/x-charts';
 
 const SpeakerGraphs = () => {
     const [scores, setScores] = useState([]);

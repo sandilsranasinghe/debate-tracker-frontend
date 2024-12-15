@@ -1,6 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Menu from './components/Menu.js'; // Ensure this path is correct
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import {ThemeProvider} from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+import {theme} from './theme.js';
+
+import Menu from './components/Menu.js';
 import Debaters from './components/Debaters.js';
 import SpeakerGraphs from "./components/SpeakerGraphs.js";
 import MasterTab from "./components/MasterTab.js";
@@ -13,7 +18,8 @@ import JudgeSpeaks from "./components/JudgeSpeaks.js";
 const App = () => {
     return (
         <Router>
-            <div className="app">
+            <ThemeProvider theme={theme}>
+                <CssBaseline/>
                 <Menu />
                 <Routes>
                     <Route path="/debaters" element={<Debaters />} />
@@ -24,7 +30,7 @@ const App = () => {
                     <Route path="/judge-speaks" element={<JudgeSpeaks />} />
                     <Route path="/judge" element={<Judges />} />
                 </Routes>
-            </div>
+            </ThemeProvider>
         </Router>
     );
 };
