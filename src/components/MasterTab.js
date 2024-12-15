@@ -123,7 +123,7 @@ const MasterTab = () => {
               },
               {
                 field: "roundsDebated",
-                headerName: "Rounds Debated",
+                headerName: "Prelims Debated",
                 width: 100,
                 sortable: true,
               },
