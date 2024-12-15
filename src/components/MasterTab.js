@@ -3,26 +3,44 @@ import './css/Rankings.css';
 
 // Utility Functions
 const removeOutliers = (scores) => {
-    const q1 = scores[Math.floor((scores.length / 4))];
-    const q3 = scores[Math.ceil((scores.length * (3 / 4))) - 1];
+    // Handle edge cases: empty or small arrays
+    if (scores.length < 4) return scores;
+
+    // Sort the scores array (non-destructive)
+    const sortedScores = scores.slice().sort((a, b) => a - b);
+
+    // Calculate Q1 and Q3
+    const q1 = sortedScores[Math.floor(sortedScores.length / 4)];
+    const q3 = sortedScores[Math.ceil(sortedScores.length * (3 / 4)) - 1];
+
+    // Calculate interquartile range (IQR)
     const iqr = q3 - q1;
-    return scores.filter(score => score >= (q1 - 1.5 * iqr) && score <= (q3 + 1.5 * iqr));
+
+    // Filter scores within the IQR bounds
+    return sortedScores.filter(score => score >= (q1 - 1.5 * iqr) && score <= (q3 + 1.5 * iqr));
 };
 
-const calcAverage = (scores) => (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+
+const calcAverage = (scores) => {
+    if (scores.length === 0) return 'NaN'; // Return 'NaN' as a string to avoid UI breaking
+    return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+};
 
 const calcStandardDeviation = (scores) => {
-    const avg = calcAverage(scores);
+    if (scores.length === 0) return 'NaN';
+    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
     return Math.sqrt(scores.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / scores.length).toFixed(2);
 };
+
 
 const MasterTab = () => {
     const [rankings, setRankings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+    const [expandedRows, setExpandedRows] = useState({});
 
-    const API_URL = `http://localhost:8080/api/v1/ballot/debater/scores-all`;
+    const API_URL = `http://localhost:8080/api/v1/debater/speaks/all`;
 
     const fetchRankings = async () => {
         try {
@@ -31,7 +49,41 @@ const MasterTab = () => {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const data = await response.json();
-            setRankings(data);
+
+            // Transform data to flatten tournament scores and calculate values
+            const transformedData = data.map((debater) => {
+                const allScores = debater.tournamentRoundScores?.flatMap((tournament) =>
+                    tournament.roundScores?.map((round) => round.score) || []
+                ) || [];
+
+                const filteredScores = removeOutliers(allScores);
+                const avgScore = allScores.length > 0 ? calcAverage(allScores) : 'NaN';
+                const stdDev = filteredScores.length > 0 ? calcStandardDeviation(filteredScores) : 'NaN';
+                const roundsDebated = debater.tournamentRoundScores?.reduce(
+                    (sum, tournament) => sum + (tournament.numberOfRounds || 0),
+                    0
+                ) || 0;
+                if(debater.firstName === 'Seniya') {
+                    console.log(`First Name: ${debater.firstName}`);
+                    console.log(`Rounds Debated: ${roundsDebated}`);
+                    console.log(`All Scores: ${allScores}`);
+                    console.log(`Filtered Scores: ${filteredScores}`);
+                    console.log(`Average Score: ${avgScore}`);
+                    console.log(`Standard Deviation: ${stdDev}`);
+                }
+
+                return {
+                    ...debater,
+                    allScores,
+                    filteredScores,
+                    avgScore,
+                    stdDev,
+                    roundsDebated,
+                };
+            });
+
+
+            setRankings(transformedData.filter((debater) => debater.roundsDebated > 0));
         } catch (err) {
             setError(err.message);
         } finally {
@@ -47,19 +99,16 @@ const MasterTab = () => {
         let sortableRankings = [...rankings];
         if (sortConfig.key) {
             sortableRankings.sort((a, b) => {
-                let aValue, bValue;
-                if (sortConfig.key === 'avgScoreWOOutliers' || sortConfig.key === 'stdDev') {
-                    const aScores = a.scores.slice().sort((x, y) => x - y);
-                    const bScores = b.scores.slice().sort((x, y) => x - y);
+                let aValue = a[sortConfig.key];
+                let bValue = b[sortConfig.key];
 
-                    const aFiltered = removeOutliers(aScores);
-                    const bFiltered = removeOutliers(bScores);
+                if (sortConfig.key === 'stdDev') {
+                    aValue = parseFloat(aValue);
+                    bValue = parseFloat(bValue);
 
-                    aValue = sortConfig.key === 'avgScoreWOOutliers' ? calcAverage(aFiltered) : calcStandardDeviation(aFiltered);
-                    bValue = sortConfig.key === 'avgScoreWOOutliers' ? calcAverage(bFiltered) : calcStandardDeviation(bFiltered);
-                } else {
-                    aValue = a[sortConfig.key];
-                    bValue = b[sortConfig.key];
+                    // Handle NaN explicitly
+                    if (isNaN(aValue)) return sortConfig.direction === 'ascending' ? 1 : -1;
+                    if (isNaN(bValue)) return sortConfig.direction === 'ascending' ? -1 : 1;
                 }
 
                 if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -70,6 +119,7 @@ const MasterTab = () => {
         return sortableRankings;
     }, [rankings, sortConfig]);
 
+
     const requestSort = (key) => {
         let direction = 'ascending';
         if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -77,16 +127,17 @@ const MasterTab = () => {
         }
         setSortConfig({ key, direction });
     };
-    const [expandedRows, setExpandedRows] = useState({}); // Track expanded rows
+
+    const toggleExpand = (index) => {
+        setExpandedRows((prev) => ({
+            ...prev,
+            [index]: !prev[index],
+        }));
+    };
 
     if (loading) return <p>Loading rankings...</p>;
     if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
-    const toggleExpand = (index) => {
-        setExpandedRows(prev => ({
-            ...prev,
-            [index]: !prev[index]
-        }));
-    };
+
     return (
         <div className="rankings">
             <h1>Debater Rankings</h1>
@@ -96,39 +147,29 @@ const MasterTab = () => {
                     <th onClick={() => requestSort('firstName')}>First Name</th>
                     <th onClick={() => requestSort('lastName')}>Last Name</th>
                     <th>Scores</th>
-                    <th onClick={() => requestSort('avgScoreWOOutliers')}>Average Score WO Outliers</th>
                     <th onClick={() => requestSort('avgScore')}>Average Score</th>
                     <th onClick={() => requestSort('roundsDebated')}>Rounds Debated</th>
                     <th onClick={() => requestSort('stdDev')}>Standard Deviation</th>
                 </tr>
                 </thead>
                 <tbody>
-                {sortedRankings.map((debater, index) => {
-                    const scores = debater.scores.sort((a, b) => a - b);
-                    const filteredScores = removeOutliers(scores);
-                    const avgScoreWOOutliers = calcAverage(filteredScores);
-                    const stdDev = calcStandardDeviation(filteredScores);
-
-                    return (
-                        <tr key={index}>
-                            <td>{debater.firstName}</td>
-                            <td>{debater.lastName}</td>
-                            {/*<td>{filteredScores.join(', ')}</td>*/}
-                            <td>
-                                {expandedRows[index]
-                                    ? filteredScores.join(', ') // Show full list if expanded
-                                    : `${filteredScores.slice(0, 3).join(', ')}...`} {/* Truncated view */}
-                                <button className="truncate" onClick={() => toggleExpand(index)}>
-                                    {expandedRows[index] ? 'Show Less' : 'Show More'}
-                                </button>
-                            </td>
-                            <td>{avgScoreWOOutliers}</td>
-                            <td>{debater.avgScore.toFixed(2)}</td>
-                            <td>{debater.roundsDebated}</td>
-                            <td>{stdDev}</td>
-                        </tr>
-                    );
-                })}
+                {sortedRankings.map((debater, index) => (
+                    <tr key={index}>
+                        <td>{debater.firstName}</td>
+                        <td>{debater.lastName}</td>
+                        <td>
+                            {expandedRows[index]
+                                ? debater.filteredScores?.join(', ') || 'No scores available'
+                                : `${debater.filteredScores?.slice(0, 3).join(', ') || 'No scores'}...`}
+                            <button className="truncate" onClick={() => toggleExpand(index)}>
+                                {expandedRows[index] ? 'Show Less' : 'Show More'}
+                            </button>
+                        </td>
+                        <td>{debater.avgScore}</td>
+                        <td>{debater.roundsDebated}</td>
+                        <td>{debater.stdDev}</td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
         </div>
