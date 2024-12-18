@@ -45,9 +45,9 @@ const Menu = () => {
             <NavButton component={Link} to="/judge-tab">
               Judge Tab
             </NavButton>
-            {/*<NavButton component={Link} to="/judge">*/}
-            {/*  Judges*/}
-            {/*</NavButton>*/}
+            <NavButton component={Link} to="/judge-sentiments">
+                Scoring Sentiments
+            </NavButton>
           </Box>
         </Toolbar>
       </AppBar>

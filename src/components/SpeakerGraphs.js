@@ -67,6 +67,8 @@ const SpeakerGraphs = () => {
 
             setTournamentDates(datesData);
             setScores(scoresData);
+        //     order the scores by date
+            setScores(scoresData.sort((a, b) => datesData[a] - datesData[b]));
         } catch (err) {
             console.error("Error fetching scores:", err);
         } finally {
