@@ -8,7 +8,7 @@ const JudgeSentiments = () => {
     const [judges, setJudges] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const API_URL = `http://localhost:8080/api/v1/statistics/sentiment?allowed-deviation=1`;
+    const API_URL = `http://localhost:8080/api/v1/statistics/sentiment?allowed-deviation=0.5`;
 
     const fetchJudges = async () => {
         try {
@@ -29,10 +29,10 @@ const JudgeSentiments = () => {
                     leniencyCount: entity.leniencyCount,
                     harshnessCount: entity.harshnessCount,
                     neutralCount: entity.neutralCount,
-                    leniency: entity.leniency,
-                    harshness: entity.harshness,
+                    leniency: totalSpeeches > 0 ? (entity.leniency / entity.leniencyCount).toFixed(2) : NaN,
+                    harshness: totalSpeeches > 0 ? (entity.harshness / entity.harshnessCount).toFixed(2) : NaN,
                     overallSentiment: entity.overallSentiment,
-                    overallDeviation: totalSpeeches > 0 ? (entity.leniency - entity.harshness) / (entity.leniencyCount + entity.harshnessCount) : NaN,
+                    overallDeviation: totalSpeeches > 0 ? ((entity.leniency - entity.harshness) / (entity.leniencyCount + entity.harshnessCount)).toFixed(2) : NaN,
                     leniencyPercentage: totalSpeeches > 0 ? ((entity.leniencyCount / totalSpeeches) * 100).toFixed(2) : NaN,
                     harshnessPercentage: totalSpeeches > 0 ? ((entity.harshnessCount / totalSpeeches) * 100).toFixed(2) : NaN,
                     neutralPercentage: totalSpeeches > 0 ? ((entity.neutralCount / totalSpeeches) * 100).toFixed(2) : NaN,
@@ -72,14 +72,14 @@ const JudgeSentiments = () => {
                     },
                     {
                         field: "speechesJudged",
-                        headerName: "Speeches Judged",
+                        headerName: "Speeches Considered",
                         width: 150,
                         sortable: true,
                         type: "number",
                     },
                     {
                         field: "leniency",
-                        headerName: "Aggregate",
+                        headerName: "Average",
                         width: 150,
                         sortable: true,
                         type: "number",
@@ -93,7 +93,7 @@ const JudgeSentiments = () => {
                     },
                     {
                         field: "harshness",
-                        headerName: "Aggregate",
+                        headerName: "Average",
                         width: 150,
                         sortable: true,
                         type: "number",
