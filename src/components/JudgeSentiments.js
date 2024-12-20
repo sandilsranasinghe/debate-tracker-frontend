@@ -1,9 +1,28 @@
 import React, {useEffect, useState} from "react";
-import Paper from "@mui/material/Paper";
+import {Button, Paper} from "@mui/material";
 import StyledDataGrid from "../utils/styledDataGrid";
 import {GridToolbar} from "@mui/x-data-grid";
+import {saveAs} from "file-saver";
 
 
+function exportToCSV(rows, columns, filename = "table_data.csv") {
+    const csvRows = [];
+
+    // Extract column headers
+    const headers = columns.map((col) => col.headerName);
+    csvRows.push(headers.join(","));
+
+    // Extract data rows
+    rows.forEach((row) => {
+        const values = columns.map((col) => row[col.field] ?? "");
+        csvRows.push(values.join(","));
+    });
+
+    // Create a Blob and trigger the download
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, filename);
+}
 const JudgeSentiments = () => {
     const [judges, setJudges] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -55,6 +74,26 @@ const JudgeSentiments = () => {
 
     return (
         <Paper sx={{maxWidth: "94vw", marginInline: "auto", marginBlock: "4vh"}}>
+            <Button
+                variant="contained"
+                sx={{ margin: 2 }}
+                onClick={() =>
+                    exportToCSV(judges, [
+                        { field: "firstName", headerName: "First Name" },
+                        { field: "lastName", headerName: "Last Name" },
+                        { field: "speechesJudged", headerName: "Speeches Considered" },
+                        { field: "leniency", headerName: "Average Leniency" },
+                        { field: "leniencyPercentage", headerName: "Leniency Frequency (%)" },
+                        { field: "harshness", headerName: "Average Harshness" },
+                        { field: "harshnessPercentage", headerName: " Harshness Frequency (%)" },
+                        { field: "neutralPercentage", headerName: "Neutral Frequency (%)" },
+                        { field: "overallSentiment", headerName: "Overall Sentiment" },
+                        { field: "overallDeviation", headerName: "Overall Deviation" },
+                    ])
+                }
+            >
+                Download CSV
+            </Button>
             <StyledDataGrid
                 rows={judges}
                 columns={[
@@ -132,10 +171,12 @@ const JudgeSentiments = () => {
                     {
                         groupId: 'Leniency',
                         children: [{field: 'leniency'}, {field: 'leniencyPercentage'}],
+                        headerAlign: 'center',
                     },
                     {
                         groupId: 'Harshness',
                         children: [{field: 'harshness'}, {field: 'harshnessPercentage'}],
+                        headerAlign: 'center',
                     },
                 ]}
 
