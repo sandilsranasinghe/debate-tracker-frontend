@@ -1,9 +1,37 @@
 import React, {useEffect, useState} from "react";
-import Paper from "@mui/material/Paper";
+import {Button, Paper} from "@mui/material";
 import StyledDataGrid from "../utils/styledDataGrid";
 import {GridToolbar} from "@mui/x-data-grid";
+import {saveAs} from "file-saver";
 
 // Utility Functions
+
+function exportToCSV(rows, columns, filename = "master_tab.csv") {
+    const csvRows = [];
+
+    // Extract column headers
+    const headers = columns.map((col) => col.headerName);
+    csvRows.push(headers.join(","));
+
+    // Extract data rows
+    rows.forEach((row) => {
+        const values = columns.map((col) => {
+            const value = row[col.field];
+            if (Array.isArray(value)) {
+                return value.join(" | "); // Format arrays as pipe-separated strings
+            }
+            return value ?? ""; // Default to empty string if value is null/undefined
+        });
+        csvRows.push(values.join(","));
+    });
+
+    // Create a Blob and trigger the download
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, filename);
+}
+
+
 const removeOutliers = (scores) => {
     // Handle edge cases: empty or small arrays
     if (scores.length < 4) return scores;
@@ -93,6 +121,23 @@ const MasterTab = () => {
 
     return (
         <Paper sx={{maxWidth: "94vw", marginInline: "auto", marginBlock: "4vh"}}>
+
+            <Button
+                variant="contained"
+                sx={{margin: 2}}
+                onClick={() =>
+                    exportToCSV(rankings, [
+                        {field: "firstName", headerName: "First Name"},
+                        {field: "lastName", headerName: "Last Name"},
+                        {field: "scores", headerName: "Scores"},
+                        {field: "avgScore", headerName: "Average Score"},
+                        {field: "avgScoreWOOutliers", headerName: "Avg Score WO Outliers"},
+                        {field: "roundsDebated", headerName: "Prelims Debated"},
+                        {field: "stdDev", headerName: "Standard Deviation"},
+                    ])
+                }
+                >
+                Download CSV </Button>
             <StyledDataGrid
                 rows={rankings.map((debater, index) => ({
                     ...debater,

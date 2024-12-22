@@ -5,7 +5,7 @@ import {GridToolbar} from "@mui/x-data-grid";
 import {saveAs} from "file-saver";
 
 
-function exportToCSV(rows, columns, filename = "table_data.csv") {
+function exportToCSV(rows, columns, filename = "judge_sentiments.csv") {
     const csvRows = [];
 
     // Extract column headers
